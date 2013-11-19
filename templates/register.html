@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="login"><p>
+    <h2 class="page-title">Register</h2>
+    <p> To register, please specify a username, a bitcoin address, and sign the provided message with the address from your bitcoin client. It is advisable to generate a new address for this forum </p>
+
+<form method="post" action="/register">
+  {{ form.hidden_tag() }}
+  <div class="form-group">  
+    <label class="control-label" for="username-input">1. Pick a username
+    <input class="form-control" name="username" id="username-signup-input" type="text" required placeholder="be original!"></input>
+  </div>
+ 
+  <div class="form-group">
+    <label class="control-label" for="auth-nonce-input">2. Copy this text to your bitcoin client and sign it with the bitcoin address you created for the forum</label>
+    <input class="form-control" name="auth-nonce" id="auth-nonce-signup-input" type="text" value="{{get_login_nonce()}}"></input>
+  </div>
+
+  <p>How to sign the text using the main Bitcoin client:</p>
+  <p><img width="800" src="static/img/qt_instructions.png"/></p>
+   
+  <p>How to sign the text using Electrum:</p>
+  <p><img width="800" src="static/img/electrum_instructions.png"/></p>
+
+  <p>How to sign the text using Blockchain:</p>
+  <p><img width="800" src="static/img/blockchain_instructions.png"/></p>
+  
+  <div class="form-group">
+    <label class="control-label" for="signature-input">3. Paste the signature from step 1 here</label>
+    <input class="form-control" name="signature" id="signature-signup-input" type="text" required placeholder="the message signature goes here"></input>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label" for="btc_addr-input">4. Paste the bitcoin address you created for the forum
+    <input class="form-control" name="btc_addr" id="btc_addr-signup-input" type="text" required placeholder="your publicly visible bitcoin address goes here"></input>
+  </div>
+
+  <input type="submit" class="btn btn-primary" value="Register"></input>
+</form>
+</section>
+{% endblock %}
+

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+          <div class="jumbotron">
+            <h1>Welcome to the future of online authentication! <a href="/about">Read about it!</a></h1>
+          </div>
+          {% if subforums %}
+          <section id:"subforums">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">Subforums</h2>
+              </div>
+              <div class="panel-body">
+                <div class="list-group">
+                  {% for forum in subforums %}
+                  <a href="{{forum['name']}}" class="list-group-item">
+                      <span class="badge">{{forum['num_threads']}} threads</span>
+                    {{ forum['name'] }}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </section>
+          {% endif %}
+
+          <section id="threads">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">Threads</h2>
+              </div>
+              <div class="panel-body">
+                <div class="list-group">
+                  {% for thread in threads %}
+                  <a href="{{thread.feed.link}}" class="list-group-item">
+                    <span class="badge">{{thread.entries|length}} posts</span><span class="badge" style="background: transparent; color: rgb(85,85,85); font-weight:normal">{{ (thread.entries|last).author }} <time>{{thread.entries[0].published}}</span>
+                    {{ thread.feed.title }}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% if get_app_config()['lock_threads'] %}
+            <span id="lock-threads">
+              Only <a href="#mods">moderators or members</a> can start new threads here,
+              but <em>anybody</em> can reply to existing threads.
+            </span>
+            {% endif %}
+            {% if get_app_config['lock_posts'] %}
+            <span id="lock-posts">
+              Only <a href="#mods">moderators or members</a> can participate here.
+              Sign-in if you are a moderator or member in order to post.
+            </span>
+            {% endif %}
+          </section>
+
+{% endblock %}
+{% block submitform %}
+
+          <section id="new-thread">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">New Thread</h2>
+              </div>
+
+              {% if session.get('authenticated') %} <div class="panel-body">
+                <form role="form" method="post">
+
+
+                    {# TODO: This'll just do the CSRF business. Render the rest of the form fields using Jinja later, don't want to break styling for now #}
+                  {{ form.hidden_tag() }}
+                  <div class="form-group">
+                    <label for="thread-title-input" class="control-label">Thread Title</label>
+                    <input type="text" name="title" class="form-control" id="thread-title-input" placeholder="Title" required></input>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="thread-text-input" class="control-label">First Post Text</label>
+                    <textarea name="text" rows="8" class="form-control" id="thread-text-input" placeholder="Text"></textarea>
+                  </div>
+
+                  <p style="display: none" id="nnf_email">
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="text" tabindex="0"
+                           autocomplete="off" required value="example@abc.com">
+                    (Leave this as-is, it’s a trap!)
+                  </p>
+
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+              {% else %}
+                <div class="container">
+                  <p> Please sign in or <a href="/register">sign up</a> to post. </p>
+                </div>
+              {% endif %}
+              </div>
+            </div>
+          </section>
+
+{% endblock %}
+         
+
+

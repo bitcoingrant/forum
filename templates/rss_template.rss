@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:bit="http://bitcoingrant.org" version="2.0"><channel>
+
+<title>{{title}}</title>
+<link>{{link}}</link>
+
+{% for post in posts %}
+<item>
+
+<title>{{ post['title'] }} {# RE[15]: ELECTRO #} </title>
+
+<link> {{ post['link'] }} {# http://localhost/electro+1#1yyo2q4y91o #} </link>
+<author>{{ post['author'] }}</author>
+<pubDate>{{ post['published'] }} {# Tue, 27 Aug 2013 05:51:08 +0000 #}</pubDate>
+<description>
+{{post['description']}}
+</description>
+<bit:btcaddress>{{post['bit_btcaddress']}}</bit:btcaddress>
+
+</item>
+{% endfor %}
+
+</channel></rss>

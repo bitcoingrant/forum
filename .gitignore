@@ -1,0 +1,36 @@
+*
+!.gitignore
+!.gitattributes
+!*.py
+!*.html
+
+# cryptoapi
+!cryptoapi/*.py
+
+# server
+!robots.txt
+!favicon.default.ico
+!apple-touch-icon.default.png
+!metro-tile.default.png
+
+# documentation
+!INSTALL.txt
+!LICENCE.txt
+!README.txt
+!README.md
+!requirements.txt
+!static
+!static/img
+!static/img/*.png
+!static/img/refs/
+!templates
+
+#vim temp files
+*~
+#test threads
+*.rss
+# Unignore test thread templates
+!templates/*.rss
+#compiled python files
+*.pyc
+*.swp

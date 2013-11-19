@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="login"><p>
+<h2 class="page-title">About BitAuth and this forum</h2>
+
+<p><img width="800" src="/static/img/qt_instructions.png"/></p>
+
+<p>The Bitcoin Grant Forum is a platform demonstrating the capabilities and features of <b>BitAuth</b>.
+BitAuth is a system allowing users to authenticate with websites using only their Bitcoin address, with no
+password required. Users simply sign a token using any major bitcoin client and simply paste in
+the signature log in.</p>
+
+<p>Here are some advantages to this system:</p>
+
+<ul>
+    <li>
+        <h3>Security</h3>
+        <p>
+        Traditional login systems require users to provide a password, which they implicitly trust
+        the online service provider to keep secret. In practice, this often does not happen, and user
+        passwords are regularly stolen from website databases, compromising the user's accounts on
+        any systems where they reused their password or a variation of their password.
+        </p>
+    </li>
+    <li>
+        <h3>Unification of financial and online identity, without sacrificing anonymity</h3>
+
+        <p>
+        Users of services such as this forum which implement BitAuth can reap the benefits of financial interaction
+        facilitated by conversation. Tips for good advice and funding for open source projects are only some of the
+        possibilities.
+        </p>
+    </li>
+</ul>
+
+<h3 class="title"><a href="/register">Try It Now!</a></h3>
+</ul>
+
+</section>
+{% endblock %}
+

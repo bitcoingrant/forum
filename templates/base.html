@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet" media="screen">
+
+    {% block head %}
+    {% endblock %}
+    
+  </head>
+
+  <body>
+
+      <div class="navbar navbar-inverse">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Bitcoin Grant Forum</a>
+          </div>
+          <div class="collapse navbar-collapse">
+
+          <ul class="nav navbar-nav">
+            <li><a href="/about" class="btn btn-primary">About</a></li>
+          </ul>
+    {% if session.get('authenticated')%} 
+
+            <div class="navbar-right">
+              <a class="btn btn-primary navbar-btn" href="/logout">Logout</a>
+            </div>
+          
+            <div class="navbar-right navbar-text">
+              {{session['username']}}
+                <a style="color: white" id="nnf_post-bitcoin" class="nnf_post-btcaddress" href="https://blockchain.info/address/{{session['btc_addr']}}">{{session['btc_addr']}} </a>
+            </div>
+    {% else %}
+            <form class="navbar-form navbar-right" method="post" action="/login">
+              
+              {{ g.login_form.hidden_tag() }}
+              <div class="form-group">
+                <input class="form-control" name="username" id="username-login-input" type="text" required placeholder="username"></input>
+              </div>
+              <div class="form-group">
+                <input class="form-control" name="auth-nonce" id="auth-nonce-login-input" type="text" value="{{get_login_nonce()}}"></input>
+              </div>
+              <div class="form-group">
+                <input class="form-control" name="signature" id="signature-login-input" type="text" required placeholder="message signature"></input>
+              </div>
+              <button type="submit" class="btn btn-success">Sign In</button>
+              <a href="/register" class="btn btn-primary">Sign Up</a>
+            </form>
+
+
+     {% endif %}
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+
+      <div class="container">
+
+    {# show the error messages #}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+
+        {% for message in messages %}
+         <div class="alert alert-danger">{{message}}</div>
+        {% endfor %}
+
+      {% endif %}
+    {% endwith %}
+
+        <section id="content">
+
+{% block content %}
+{% endblock %}
+
+{% block submitform %}
+{% endblock %}
+
+        </section><!-- end content section -->
+      </div><!-- /.container -->
+
+    <section id="footer">
+{% block footer %}
+{% endblock %}
+    </section>
+
+  </body>
+</html>

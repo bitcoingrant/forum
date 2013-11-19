@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{op.title}}</title>
+{% endblock %}
+
+{% block content %}
+          <div class="jumbotron">
+            <div id="1" class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">
+                  <span class="badge" style="float:right; background: transparent; color: rgb(85,85,85); font-weight:normal">{{op.author}} <a href="https://blockchain.info/address/{{op.bit_btcaddress}}">{{op.bit_btcaddress}}</a> <time>{{op.published}}</time></span>
+                    #1.{{op.title}} 
+                </h2>
+              </div>
+              <div class="panel-body" style="overflow: hidden">
+                <div style="font-size: 14px">
+                {{markdown(op.summary)|safe}}
+                </div> 
+              </div>
+           </div>
+         </div>
+         
+          <section class="pages" id="header-pages">
+          {% if numpages > 0 %}
+            <p>Pages:
+            {% for number in range(numpages) %}
+            <a href="{{url_for('thread', thread=thread_name, page=number+1)}}">{{number+1}}</a>
+            {% endfor %}
+            </p>
+            {% endif %}
+          </section>
+
+         <section id="posts">
+            {% for (idx, reply) in replies %}
+            <div id="{{idx+2}}" class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">
+                  <span class="badge" style="float:right; background: transparent; color: rgb(85,85,85); font-weight:normal">
+                    {{reply.author}} <a href="https://blockchain.info/address/{{reply.bit_btcaddress}}">{{reply.bit_btcaddress}}</a> <time>{{reply.published}}
+                  </span>
+                    [RE] #{{idx+2}}. {{op.title}} 
+                </h2>
+              </div>
+              <div class="panel-body" style="overflow: hidden">
+                {{markdown(reply.summary)|safe}}
+              </div>
+            </div>
+            {% endfor %}
+          </section>
+
+          <section class="pages" id="footer-pages">
+          {% if numpages > 0 %}
+            <p>Pages:
+            {% for number in range(numpages) %}
+            <a href="{{url_for('thread', thread=thread_name, page=number+1)}}">{{number+1}}</a>
+            {% endfor %}
+            </p>
+          {% endif %}
+          </section>
+{% endblock %}
+{% block submitform %}
+          <section id="reply">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h2 class="panel-title">Reply</h2>
+              </div>
+
+              <div class="panel-body">
+                {% if session.get('authenticated') %}
+                <form method="post" role="form">
+                  {{ form.hidden_tag() }}
+
+                  <p style="display: none" id="nnf_email">
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="text"  tabindex="0"
+                           autocomplete="off" required value="example@abc.com">
+                    (Leave this as-is, it’s a trap!)
+                  </p>
+
+                  <div class="form-group">
+                    <label for="thread-text-input" class="control-label">Post Text</label>
+                    <textarea name="text" rows="8" class="form-control" id="thread-text-input" placeholder="Text"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+
+              {% else %}
+                  <p> Please sign in or <a href="/register">sign up</a> to post. </p>
+              {% endif %}
+              </div>
+
+            </div>
+          </section>
+{% endblock %}

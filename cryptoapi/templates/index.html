@@ -1,0 +1,35 @@
+{% extends 'parent.html' %}
+{% block content %}
+<div><h2>WARNING: DO NOT PUT ANYTHING SENSITIVE IN HERE - THIS IS JUST FOR TESTING</h2></div>
+
+
+<div><h3>Generate a Bitcoin public/private key</h3>
+	<form method="POST" action="#">
+		Username: <input required="" type="text" name="username" value="{% print result['username'] %}" />
+		Password: <input required="" type="password" name="password" value="{% print result['password'] %}" />
+		<input type="submit" name="sendUserPass" value="Create" />
+	</form>
+	<form method="POST" action="#">
+		Private Key: <input required="" type="text" name="priv_key" value="{% print result['priv_key'] %}" />
+		<input type="submit" name="sendPrivKey" value="Create" />
+	</form>
+	{% if result['public_key'] %}
+	Public Key: {% print result['public_key'] %} <br />
+	Private Key: {% print result['private_key'] %}
+	{% endif %}
+</div>
+
+<div><h3>Encrypt a message with a Bitcoin public key</h3></div>
+	<form method="POST" action="#">
+		Public Key: <input type="text" required="" name="public_key" value="{% print result['public_key'] %}" /><br />
+		Message: <input type="text" required="" name="message" value="{% print result['message'] %}" /><br />
+		<input type="submit" name="encryptMessage" value="Encrypt" />
+	</form>
+	{% if result['encrypted_message'] %}
+	Encrypted Message: {% print result['encrypted_message'] %} <br />
+	{% endif %}
+</div>
+
+
+<br /><br />
+{% endblock %}
