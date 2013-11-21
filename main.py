@@ -40,13 +40,13 @@ def generate_session_nonce():
         g.login_form = LoginForm()
 
 
+"""
 @app.route('/robots.txt')
 def static_from_root():
-    """
     Send robots.txt even if we don't have a webserver override
     serving files from /static
-    """
     return send_from_directory(app.static_folder, request.path[1:])
+"""
 
 
 # Webserver routes
@@ -83,6 +83,7 @@ def register():
         return render_template('register.html', form=SignupForm())
     elif request.method == 'POST':
         return forum.register_username(SignupForm(request.form))
+
 
 @app.route('/about', methods=['GET'])
 def about():

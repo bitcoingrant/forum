@@ -6,13 +6,48 @@
     <!-- Bootstrap -->
     <link href="/static/bootstrap.min.css" rel="stylesheet" media="screen">
 
+    <style type="text/css">
+        html, body {height: 100%;}
+
+        #wrap {min-height: 100%;}
+
+        #main {overflow:auto;
+            padding-bottom: 50px;}  /* must be same height as the footer */
+
+        #footer {position: relative;
+            margin-top: -50px; /* negative value of footer height */
+            height: 50px;
+            clear:both;} 
+
+        /*Opera Fix*/
+        body:before {
+            content:"";
+            height:100%;
+            float:left;
+            width:0;
+            margin-top:-32767px;/
+        } 
+
+        .navbar-text a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+
+<!--[if !IE 7]>
+	<style type="text/css">
+		#wrap {display:table;height:100%}
+	</style>
+<![endif]-->
+
     {% block head %}
     {% endblock %}
     
   </head>
 
   <body>
-
+  <div id="wrap"> <!-- wrap the content to allow for footer -->
+      <div id="main">
       <div class="navbar navbar-inverse">
         <div class="container">
           <div class="navbar-header">
@@ -36,7 +71,7 @@
           
             <div class="navbar-right navbar-text">
               {{session['username']}}
-                <a style="color: white" id="nnf_post-bitcoin" class="nnf_post-btcaddress" href="https://blockchain.info/address/{{session['btc_addr']}}">{{session['btc_addr']}} </a>
+             potstra   <a style="color: white" id="nnf_post-bitcoin" class="nnf_post-btcaddress" href="https://blockchain.info/address/{{session['btc_addr']}}">{{session['btc_addr']}} </a>
             </div>
     {% else %}
             <form class="navbar-form navbar-right" method="post" action="/login">
@@ -85,10 +120,21 @@
         </section><!-- end content section -->
       </div><!-- /.container -->
 
+    <!--
     <section id="footer">
 {% block footer %}
 {% endblock %}
     </section>
+    -->
+
+    </div> <!-- end div #main -->
+    </div> <!-- end div #wrap -->
+
+    <div id="footer">
+        <div class="navbar navbar-inverse" style="margin-bottom: 0;">
+            <p class="navbar-text navbar-right">Powered by BitAuth <a href="https://github.com/bitcoingrant/forum/">Read the source</a></p>
+        </div>
+    </div>
 
   </body>
 </html>

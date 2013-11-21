@@ -12,7 +12,8 @@ import os
 import markdown
 
 from datetime import datetime
-from flask import render_template, redirect, url_for, abort, request, flash, session
+from flask import render_template, redirect, url_for, abort,\
+    request, flash, session
 from lockfile import FileLock
 from xml.sax.saxutils import unescape
 
@@ -55,32 +56,34 @@ def show_thread(thread_name, page, subforum='/'):
     from main import app
 
     """ Render and return the html of the given page of the given thread """
-    thread = feedparser.parse(os.path.normpath('static' + subforum + '/' + thread_name+'.rss'))
+    path = os.path.normpath('static' + subforum + '/' + thread_name+'.rss')
+    thread = feedparser.parse(path)
 
     # If it doesn't load succesfully, 404
     if not thread.feed:
         abort(404)
 
     op = thread.entries[-1]
-    title = op.title
     start_post = (page-1)*app.config['NUM_POSTS_PER_PAGE'] + 1
     end_post = (page)*app.config['NUM_POSTS_PER_PAGE'] + 1
     #TODO: Reversing doesn't scale
     replies = [x for x in reversed(thread.entries)][start_post:end_post]
 
-    numpages = int(math.ceil((len(thread.entries) - 1) / float(app.config['NUM_POSTS_PER_PAGE'])))
+    numreplies = (len(thread.entries)-1)
+    numpages = numreplies / float(app.config['NUM_POSTS_PER_PAGE'])
+    numpages = int(math.ceil(numpages))
 
     return render_template('thread.html',
-                            thread = thread,
-                            thread_name = thread_name,
-                            replies = enumerate(replies),
-                            op = op,
-                            title = op.title,
-                            unescape = unescape,
-                            page = page,
-                            markdown = markdown.markdown,
-                            numpages = numpages,
-                            form=ThreadReplyForm())
+                           thread=thread,
+                           thread_name=thread_name,
+                           replies=enumerate(replies),
+                           op=op,
+                           title=op.title,
+                           unescape=unescape,
+                           page=page,
+                           markdown=markdown.markdown,
+                           numpages=numpages,
+                           form=ThreadReplyForm())
 
 
 #XXX: Use redis for the userlist, or a public rss feed?
@@ -99,7 +102,7 @@ def set_btc_addr(username, btc_addr):
         users = json.loads(users)
 
         # No matching user found, add 'im
-        users[username] = {'btc_addr':btc_addr}
+        users[username] = {'btc_addr': btc_addr}
 
         f = open('users.json', 'w')
         f.write(json.dumps(users))
@@ -125,7 +128,10 @@ def get_userlist():
 
 
 def reply_thread(thread_name, form, subforum='/'):
-    """ Takes user data from flask.form, checks it, and adds the reply to the target thread """
+    """
+    Takes user data from flask.form, checks it, and adds the
+    reply to the target thread
+    """
     from main import app
 
     if app.config['FORUM_GLOBAL'].get('lock_posts'):
@@ -140,27 +146,32 @@ def reply_thread(thread_name, form, subforum='/'):
         flash('Log in to reply')
         return redirect(url_for('thread', thread=thread_name))
 
-    # Okay, we're going to rerender the whole goddamn file. This is inefficient, we'll
-    # figure out a better and less lazy way of doing this later
+    # Okay, we're going to rerender the whole file.
+    # This is inefficient, so we'll have to
+    # figure out a better way of doing this later
     lock = FileLock(thread_name + '.lock')
     with lock:
-        thread = feedparser.parse(os.path.normpath('static' + subforum + '/' + thread_name+'.rss'))
+        path = os.path.normpath('static' + subforum + '/' + thread_name+'.rss')
+        thread = feedparser.parse(path)
 
         title = thread.feed.title
         link = thread.feed.link
 
         entry = {
             # Jinja rendering should escape this as unsafe
-            'description' : form.text.data,
-            'title': 'RE [{}]: {}'.format(len(thread.entries) + 1, thread.feed.title),
-            'author' : session['username'],
-            'published' : str(datetime.now()), #TODO: Date formatting
+            'description': form.text.data,
+            'title': 'RE [{}]: {}'.format(len(thread.entries) + 1,
+                                          thread.feed.title),
+            'author': session['username'],
+            'published': str(datetime.now()),  # TODO: Date formatting
             'link': '',
             'bit_btcaddress': session['btc_addr'],
         }
 
         util.render_thread_rss(thread_name, subforum,
-                [entry] + thread.entries, title=title, link=link)
+                               [entry] + thread.entries,
+                               title=title,
+                               link=link)
     # Just redirect to the the root page for now
     return redirect('/')
 
@@ -168,7 +179,7 @@ def reply_thread(thread_name, form, subforum='/'):
 def new_thread(form, subforum):
     """ Create a new thread rss file in the /static folder """
     from main import app
-    
+
     if not form.validate():
         flash('Invalid input')
         return redirect('/')
@@ -177,7 +188,7 @@ def new_thread(form, subforum):
     # TODO: Make this have fewer side effects. Return messages to flash?
     if not session.get('authenticated'):
         flash('You must be logged in to post')
-        return redirect('/') 
+        return redirect('/')
 
     if app.config['FORUM_GLOBAL'].get('lock_threads'):
         flash('Thread creation is locked')
@@ -198,15 +209,15 @@ def new_thread(form, subforum):
             flash('A thread with that name already exists')
             return redirect('/')
 
-        link = app.config['SITE_ROOT'] + subforum + '/' + thread_name 
+        link = app.config['SITE_ROOT'] + subforum + '/' + thread_name
         entry = {
             # Jinja rendering should escape this as unsafe
-            'description' : form.text.data, 
+            'description': form.text.data,
             'title': title,
-            'author' : session['username'],
-            'published' : str(datetime.now()),
+            'author': session['username'],
+            'published': str(datetime.now()),
             'link': app.config['SITE_ROOT'] + subforum + thread_name + '#1',
-            'bit_btcaddress': session['btc_addr'], 
+            'bit_btcaddress': session['btc_addr'],
         }
 
         if not entry['description']:
@@ -214,8 +225,8 @@ def new_thread(form, subforum):
             print "Failblog"
             abort(400)
 
-        util.render_thread_rss(thread_name, subforum, 
-                [entry], title, link=link)
+        util.render_thread_rss(thread_name, subforum,
+                               [entry], title, link=link)
 
     # This is annoying, but just redirect to the root page for now
     flash('Your post went through!')
@@ -229,13 +240,13 @@ def authenticate(form):
         flash('Invalid input')
         return redirect('/')
 
-    sig = form.signature.data
+    sig = form.signature.data.strip()
     message = get_nonce_message()
-    username = form.username.data
+    username = form.username.data.strip()
 
     users = get_userlist()
     print users
-    if not username in users:  
+    if not username in users:
         flash('The provided username is unregistered. Sign up!')
         return redirect('/register')
 
@@ -248,8 +259,8 @@ def authenticate(form):
 
     print btc_addr
 
-    session['authenticated'] = True 
-    session['username'] = username 
+    session['authenticated'] = True
+    session['username'] = username
     session['btc_addr'] = btc_addr
     flash('Authenticated!')
     return redirect('/')
@@ -263,27 +274,26 @@ def register_username(form):
         return redirect('/register')
 
     # site-auth-data::uuid4():
-    sig = form.signature.data
+    sig = form.signature.data.strip()
     message = get_nonce_message()
-    btc_addr = form.btc_addr.data
-    username = form.username.data
+    btc_addr = form.btc_addr.data.strip()
+    username = form.username.data.strip()
 
     users = get_userlist()
-    if username in users:  
+    if username in users:
         flash('That username is already taken')
         return redirect(url_for('register'))
 
     if not check_sig(message, sig, btc_addr):
-        print 'Sig check fail {} {} {}'.format(nonce, sig, btc_addr)
+        print 'Sig check fail {} {} {}'.format(message, sig, btc_addr)
         flash('Signature check failed. Did you copy the the supplied text exactly?')
         return redirect(url_for('register'))
 
     set_btc_addr(username, btc_addr)
 
-    session['authenticated'] = True 
-    session['username'] = username 
+    session['authenticated'] = True
+    session['username'] = username
     session['btc_addr'] = btc_addr
     print 'Registered user ' + username
     flash('Congratulations, you\'re registered!')
     return redirect('/')
-
