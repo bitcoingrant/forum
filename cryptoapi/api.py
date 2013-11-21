@@ -5,26 +5,9 @@ from pprint import pprint
 
 app = flask.Flask(__name__)
 
-#define these functions:
-# get_bitcoin_keypair(string) - passes back a bitcoin-valid keypair when it receives a string
-# decrypt(message, private_key) - passes back a decrypted message when it receives a message and a private key
-# encrypt(message, public_key) - passes back an encrypted message when it receives a message and a public key
-# sign_message(message, private_key) - passes back a signed message when it receives a message and a private key
-# validate_signed_message(message, public_key) - passes back a true/false when it receives a message and a public key
-# get_bitcoin_address(private_key) - passes back a valid bitcoin message when it receives a private key
-
-
-username='user1234637'
-password='over20charincnumand!./; etc.'
-salt='maybewegetridofthis'
-seed1 = username+password+salt
-seed1 = hashlib.sha512(seed1).hexdigest()
-print seed1
-
-#to get a valid wallet-import format private key we need to then follow the wallet import protocol (maybe worry about this later)
-
 @app.route("/", methods=['GET', 'POST'])
 def home():
+    """ Default route for cryptoapi web interface """
     print request.form.keys()
     result = {'username':'','password':'','public_key':'','message':''}
     
@@ -63,13 +46,15 @@ def home():
             
     return render_template('index.html', result=result)
 
-#create a private key from the username and password
 @app.route("/get_priv/<user_data>", methods=['POST'])
 def get_priv(user_data):
+    """ Create a deterministic private key from a username and password """
     return hashlib.sha256(user_data).hexdigest()
 
 @app.route("/convert_to_wif", methods=['POST'])
 def convert_to_wif():
+    """ Convert hex-encoded private key to Wallet Import Format """
+    #XXX: Untested
     #http://gobittest.appspot.com/PrivateKey and https://en.bitcoin.it/wiki/Wallet_import_format
     try:
         #step 1
@@ -101,16 +86,16 @@ def convert_to_wif():
     except Exception as e:
         print str(e)
         
-#get a valid bitcoin / bitmessage keypair
 #@app.route("/get_keypair/<priv_key>", methods=['POST'])
 def get_keypair(priv_key):
+    """Get a valid bitcoin keypair"""
     keypair = {'public_key':generate_keypair.generate_btc_address(int(priv_key,16))[3],'private_key':str(priv_key)}
 
     return keypair
 
-#get a valid bitcoin / bitmessage keypair
 @app.route("/get_btcaddress", methods=['POST'])
 def get_btcaddress():
+    """ Get Bitcoin address for public key """
     try:        
         return str(get_keypair(request.form['priv_key'])['public_key'])
     except Exception as e:
@@ -119,12 +104,17 @@ def get_btcaddress():
 #Encrypt a message with a bitcoin address
 @app.route("/encrypt/<somedict>", methods=['POST'])
 def encrypt_message(somedict):
-    #grab the pub key and message from the json, encrypt the message using the pub key, return the encrypted message
+    """
+    Grab the pub key and message from the json, encrypt the message using the pub key,
+    return the encrypted message
+    """
+    #XXX:WIP
     if somedict['message']: somedict['message'] = 'pretend this message is encypted now'
     return somedict
 
 @app.route("/sign", methods=['POST'])
 def sign_message():
+    """ ECDSA sign provided message with provided public key """
     try:
         priv_key = int(request.form['priv_key'], 16)
         message = request.form['message']
@@ -135,6 +125,7 @@ def sign_message():
 
 @app.route("/check_sig", methods=['POST'])
 def check_signature():
+    """ Check that provided signature of provided message matches provided bitcoin address """
     try:
         signature = request.form['signature']
         print signature

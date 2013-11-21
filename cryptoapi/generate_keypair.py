@@ -15,6 +15,10 @@ import base64
 from ecdsa.ecdsa import curve_secp256k1, generator_secp256k1
 from ecdsa.curves import SECP256k1
 
+##
+## Credit for parts of this code goes to the Electrum bitcoin client https://github.com/spesmilo/electrum
+##
+
 ## Bitcoin has an adorable encoding scheme that includes numbers and letters
 ## but excludes letters which look like numbers, eg "l" and "O"
 ## This appears to be from Electrum, please confirm by replacing this line with attribution
@@ -198,5 +202,4 @@ def generate_btc_address(secret):
         addr_58
     )
 
-print generate_btc_address(0x552219f09e1b3537df689113be859f6bd0e57c403bb7ac10fd4ec7c07b378f01)[3]
 

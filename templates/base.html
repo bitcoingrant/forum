@@ -71,7 +71,7 @@
           
             <div class="navbar-right navbar-text">
               {{session['username']}}
-             potstra   <a style="color: white" id="nnf_post-bitcoin" class="nnf_post-btcaddress" href="https://blockchain.info/address/{{session['btc_addr']}}">{{session['btc_addr']}} </a>
+             <a style="color: white" id="nnf_post-bitcoin" class="nnf_post-btcaddress" href="https://blockchain.info/address/{{session['btc_addr']}}">{{session['btc_addr']}} </a>
             </div>
     {% else %}
             <form class="navbar-form navbar-right" method="post" action="/login">
