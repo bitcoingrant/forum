@@ -10,7 +10,7 @@ print
 int1hex = hex(int1)
 
 print int1hex
-print int(int1hex,16)
+print int(int1hex, 16)
 print
 
 import binascii
@@ -36,8 +36,10 @@ def b58encode(v):
     # leading 0-bytes in the input become leading-1s
     nPad = 0
     for c in v:
-        if c == '\0': nPad += 1
-        else: break
+        if c == '\0':
+            nPad += 1
+        else:
+            break
 
     return (__b58chars[0]*nPad) + result
 

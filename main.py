@@ -4,7 +4,7 @@ main.py
 Defines flask endpoints, and start flask development
 server for the forum
 """
-import os
+import os, sys
 import uuid
 
 from flask import Flask, render_template, redirect,\
@@ -17,8 +17,19 @@ from redis_sessions import RedisSessionInterface
 from forms import NewThreadForm, LoginForm, SignupForm, ThreadReplyForm
 
 app = Flask(__name__)
-app.session_interface = RedisSessionInterface()
-app.config.from_pyfile('config.py')
+
+error_msg = None
+try:
+    app.session_interface = RedisSessionInterface()
+except:
+    sys.stderr.write("ERROR: Failed to connect to Redis")
+    error_msg = "Failed to connect to Redis. Please contact server administrator"
+
+try:
+    app.config.from_pyfile('config.py')
+except:
+    sys.stderr.write("ERROR: Failed to read app config")
+    error_msg = "Failed to load config. Please contact server administrator"
 
 
 @app.template_global()
@@ -66,8 +77,8 @@ def thread(thread=None, page=1, subforum='/'):
 
 @app.route('/<thread>/post/<int:post_num>', methods=['GET', 'POST'])
 def thread_post(thread=None, post_num=1):
-    thread_num = int(post_num/app.config['NUM_POSTS_PER_PAGE'])
-    return redirect(url_for('thread', thread=thread_num)+'#'+str(post_num))
+    thread_num = int(post_num / app.config['NUM_POSTS_PER_PAGE'])
+    return redirect(url_for('thread', thread=thread_num) + '#' + str(post_num))
 
 
 @app.route('/favicon.ico')
@@ -109,7 +120,6 @@ def logout():
     return redirect('/')
 
 
-@app.route('/', methods=['GET', 'POST'])
 def index(subforum=''):
     print "Subforum: " + subforum
 
@@ -118,9 +128,9 @@ def index(subforum=''):
 
     # Figure out what threads and subforums we have
     # by looking at the directory tree
-    threads = util.find_threads(current_subforum='static'+subforum)
+    threads = util.find_threads(current_subforum='static' + subforum)
 
-    subforums = util.subforums(current_subforum='static'+subforum)
+    subforums = util.subforums(current_subforum='static' + subforum)
 
     # The directory tree to the current subforum
     return render_template('index.html', threads=threads,
@@ -129,6 +139,13 @@ def index(subforum=''):
                            config=app.config['FORUM_GLOBAL'],
                            nonce=forum.get_nonce_message(),
                            form=NewThreadForm())
+
+# Route the main page to the regular one if everything was okay with startup
+# otherwise show an error page
+if not error_msg:
+    app.route('/', methods=['GET', 'POST'])(index)
+else:
+    app.route('/', methods=['GET', 'POST'])(lambda: (error_msg, 500))
 
 
 def route_subforums(subroute='/', subforum_path='static'):
@@ -149,25 +166,25 @@ def route_subforums(subroute='/', subforum_path='static'):
 
     subforums = util.find_subforums(current_subforum=subforum_path)
     for forum in subforums:
-        new_subroute = subroute+forum
+        new_subroute = subroute + forum
 
         print "Routing to " + new_subroute
         app.add_url_rule(new_subroute,
-                         (new_subroute).replace('/', '_')+'_index',
+                         (new_subroute).replace('/', '_') + '_index',
                          wrap_index(new_subroute),
                          methods=['GET', 'POST'])
 
-        app.add_url_rule(subroute+forum+'/<thread>',
-                         (subroute+forum).replace('/', '_')+'thread',
+        app.add_url_rule(subroute + forum + '/<thread>',
+                         (subroute + forum).replace('/', '_') + 'thread',
                          wrap_thread(new_subroute),
                          methods=['GET', 'POST'])
 
-        app.add_url_rule(new_subroute+'/<thread>/<int:page>',
-                         (new_subroute).replace('/', '_')+'thread_',
+        app.add_url_rule(new_subroute + '/<thread>/<int:page>',
+                         (new_subroute).replace('/', '_') + 'thread_',
                          wrap_thread_page(new_subroute),
                          methods=['GET', 'POST'])
 
-        route_subforums(subroute=new_subroute+'/',
+        route_subforums(subroute=new_subroute + '/',
                         subforum_path=os.path.join(subforum_path, forum))
 
 

@@ -66,7 +66,7 @@ def show_thread(thread_name, page, subforum='/'):
     op = thread.entries[-1]
     start_post = (page-1)*app.config['NUM_POSTS_PER_PAGE'] + 1
     end_post = (page)*app.config['NUM_POSTS_PER_PAGE'] + 1
-    #TODO: Reversing doesn't scale
+    # TODO: Reversing doesn't scale
     replies = [x for x in reversed(thread.entries)][start_post:end_post]
 
     numreplies = (len(thread.entries)-1)
@@ -86,7 +86,7 @@ def show_thread(thread_name, page, subforum='/'):
                            form=ThreadReplyForm())
 
 
-#XXX: Use redis for the userlist, or a public rss feed?
+# XXX: Use redis for the userlist, or a public rss feed?
 def set_btc_addr(username, btc_addr):
     """ Atomically add a user to the userlist file """
     lock = FileLock('userlist')
@@ -286,7 +286,8 @@ def register_username(form):
 
     if not check_sig(message, sig, btc_addr):
         print 'Sig check fail {} {} {}'.format(message, sig, btc_addr)
-        flash('Signature check failed. Did you copy the the supplied text exactly?')
+        flash(
+            'Signature check failed. Did you copy the the supplied text exactly?')
         return redirect(url_for('register'))
 
     set_btc_addr(username, btc_addr)

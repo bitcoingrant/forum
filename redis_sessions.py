@@ -1,6 +1,7 @@
 
 
 import pickle
+import time
 from datetime import timedelta
 from uuid import uuid4
 from redis import Redis
@@ -25,9 +26,12 @@ class RedisSessionInterface(SessionInterface):
 
     def __init__(self, redis=None, prefix='session:'):
         if redis is None:
-            redis = Redis()
+            redis = Redis("localhost")
         self.redis = redis
         self.prefix = prefix
+
+        # Store startup time and thus test the connection
+        self.redis.set("started_server", str(time.time()))
 
     def generate_sid(self):
         return str(uuid4())
